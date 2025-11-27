@@ -1,173 +1,225 @@
-// ==========================================================
-// SABİT TANIMLAMALAR
-// ==========================================================
-const TOPLAM_AYET_SAYISI = 5;
-let ezberlenenAyetSayisi = 0;
-
-// ==========================================================
-// BAŞLANGIÇ: Sayfa Yüklendiğinde
-// ==========================================================
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Ezber ilerlemesini LocalStorage'dan yükle
-    ezberlenenAyetSayisi = parseInt(localStorage.getItem('ezberlenenAyet') || '0', 10);
-    
-    // 2. Sayfadaki göstergeleri ve ayet işaretlerini güncelle
-    guncelleGostergeleri();
-    ezberlenenAyetleriIsaretle();
-    
-    // 3. Zikir sayaçlarını yükle
-    yukleTekrarSayilari();
-});
-
-// ==========================================================
-// EZBER TAKİP FONKSİYONLARI
-// ==========================================================
-
-/**
- * Ezberlenen ayet sayısına göre ilerleme çubuğunu ve metni günceller.
- */
-function guncelleGostergeleri() {
-    const yuzde = (ezberlenenAyetSayisi / TOPLAM_AYET_SAYISI) * 100;
-    
-    document.getElementById('ezberlenen-adet').textContent = ezberlenenAyetSayisi;
-    document.getElementById('ilerleme-yuzde').style.width = yuzde + '%';
+/* --- GLOBAL ANİMASYON GEÇİŞLERİ --- */
+* {
+    box-sizing: border-box;
 }
 
-/**
- * Ezberlenen ayet sayısına kadar olan ayetlere "ezberlendi" sınıfını ekler.
- */
-function ezberlenenAyetleriIsaretle() {
-    const ayetler = document.querySelectorAll('.ayet-kapsayici');
-    ayetler.forEach((ayetElement) => {
-        const ayetNo = parseInt(ayetElement.dataset.ayet, 10);
-        const ezberleBtn = ayetElement.querySelector('.ezberle-btn');
-        
-        if (ayetNo <= ezberlenenAyetSayisi) {
-            ayetElement.classList.add('ezberlendi');
-            if (ezberleBtn) {
-                ezberleBtn.disabled = true;
-                ezberleBtn.textContent = 'Ezberlendi ✅';
-            }
-        } else {
-            ayetElement.classList.remove('ezberlendi'); 
-            if (ezberleBtn) {
-                ezberleBtn.disabled = false;
-                ezberleBtn.textContent = 'Ezberledim ✅';
-            }
-        }
-    });
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+    line-height: 1.6;
+    transition: background-color 0.4s ease; /* Yumuşak arka plan geçişi */
 }
 
-/**
- * Belirtilen ayeti ezberlendi olarak işaretler ve ilerlemeyi günceller.
- * @param {number} ayetNo - Ezberlenen ayetin numarası
- */
-function tamamlandiIsaretle(ayetNo) {
-    if (ayetNo > TOPLAM_AYET_SAYISI) return; 
-
-    // Ayetleri sırayla işaretlemeyi zorlamak için kontrol
-    if (ayetNo === ezberlenenAyetSayisi + 1 || ayetNo === 1) { 
-        ezberlenenAyetSayisi = ayetNo;
-        localStorage.setItem('ezberlenenAyet', ezberlenenAyetSayisi.toString());
-        
-        guncelleGostergeleri();
-        ezberlenenAyetleriIsaretle(); 
-
-        if (ezberlenenAyetSayisi === TOPLAM_AYET_SAYISI) {
-            alert("Tebrikler! Fil Suresi ezberiniz tamamlandı! 🥳");
-        } else {
-            alert(`${ayetNo}. ayet ezberlendi. Sıradaki hedef: ${ezberlenenAyetSayisi + 1}. ayet.`);
-        }
-    } else if (ayetNo <= ezberlenenAyetSayisi) {
-        alert("Bu ayeti zaten ezberlemişsiniz.");
-    } else {
-        alert(`Lütfen sıradaki (${ezberlenenAyetSayisi + 1}. ) ayeti ezberleyiniz.`);
-    }
+/* Tüm buton ve etkileşimli elemanlara yumuşak geçiş ekle */
+button, .ayet-kapsayici, .sure-bolum-buton {
+    transition: all 0.3s ease-in-out; 
 }
 
-/**
- * Tüm ilerlemeyi sıfırlar (Hem ezber hem de tekrar sayısı).
- */
-function sifirlaIlerleme() {
-    if (confirm("Tüm ezber ve tekrar ilerlemesini sıfırlamak istediğinize emin misiniz?")) {
-        ezberlenenAyetSayisi = 0;
-        localStorage.clear(); // Tüm LocalStorage verisini temizle
-        
-        guncelleGostergeleri();
-        ezberlenenAyetleriIsaretle();
-        yukleTekrarSayilari(); // Sayaçları da sıfırlayıp yükler
-        alert("Ezber ve tekrar ilerlemesi sıfırlandı.");
-    }
+header {
+    background-color: #4CAF50; 
+    color: white;
+    text-align: center;
+    padding: 1.5em 0 0; 
 }
 
-// ==========================================================
-// OKUNUŞ/MEAL GÖSTERİMİ
-// ==========================================================
-
-/**
- * Ayetlerin okunuş ve mealini gösterir/gizler.
- * @param {HTMLButtonElement} button - Tıklanan buton elementi
- */
-function toggleDetay(button) {
-    const kapsayici = button.closest('.ayet-kapsayici');
-    // Okunuş ve Meal elementlerini bul
-    const detaylar = kapsayici.querySelectorAll('.ayet-detay');
-    
-    let isGizli = false; // Tüm detayların gizli olup olmadığını kontrol etmek için
-    
-    detaylar.forEach(detay => {
-        detay.classList.toggle('gizli');
-        isGizli = detay.classList.contains('gizli');
-    });
-
-    // Buton metnini değiştir
-    button.textContent = isGizli ? 'Okunuş/Meal Göster' : 'Detayları Gizle';
+/* --- FOOTER VE ANA YAPILAR --- */
+footer {
+    background-color: #4CAF50; 
+    color: white;
+    text-align: center;
+    padding: 1em 0;
+    margin-top: 20px;
 }
 
-// ==========================================================
-// ZİKİR SAYACI FONKSİYONLARI
-// ==========================================================
-
-/**
- * Belirtilen ayetin tekrar sayısını bir artırır.
- * @param {number} ayetNo - Tekrarı artırılacak ayetin numarası.
- */
-function tekrarArtir(ayetNo) {
-    const key = `tekrar-${ayetNo}`;
-    let sayi = parseInt(localStorage.getItem(key) || '0', 10);
-    sayi++;
-    
-    localStorage.setItem(key, sayi.toString());
-    const sayacElement = document.getElementById(key);
-    if(sayacElement) {
-        sayacElement.textContent = sayi;
-    }
+#ana-navigasyon {
+    display: flex;
+    justify-content: center;
+    background-color: #388e3c; 
 }
 
-/**
- * Belirtilen ayetin tekrar sayısını sıfırlar.
- * @param {number} ayetNo - Tekrarı sıfırlanacak ayetin numarası.
- */
-function tekrarSifirla(ayetNo) {
-    const key = `tekrar-${ayetNo}`;
-    localStorage.setItem(key, '0');
-    const sayacElement = document.getElementById(key);
-    if(sayacElement) {
-        sayacElement.textContent = '0';
-    }
+#ana-navigasyon button {
+    background: none;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    border-bottom: 3px solid transparent;
 }
 
-/**
- * Sayfa yüklendiğinde tüm ayetlerin kayıtlı tekrar sayılarını göstergeye yansıtır.
- */
-function yukleTekrarSayilari() {
-    for (let i = 1; i <= TOPLAM_AYET_SAYISI; i++) {
-        const key = `tekrar-${i}`;
-        const sayi = parseInt(localStorage.getItem(key) || '0', 10);
-        const sayacElement = document.getElementById(key);
-        
-        if (sayacElement) {
-            sayacElement.textContent = sayi;
-        }
-    }
+#ana-navigasyon button:hover {
+    background-color: #4CAF50;
 }
+
+#ana-navigasyon button.aktif {
+    background-color: #4CAF50;
+    border-bottom: 3px solid #FFC107; 
+}
+
+main {
+    padding: 20px;
+    max-width: 800px;
+    margin: 20px auto;
+    background: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.bolum-icerik.gizli {
+    display: none; 
+}
+
+/* --- AYET KAPSAYICI VE EZBER ANİMASYONU --- */
+.ayet-kapsayici {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out; 
+    transform: scale(1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+}
+
+.ezberlendi {
+    background-color: #e8f5e9; 
+    border-left: 5px solid #4CAF50;
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.4); 
+    animation: ezberOnay 0.6s ease-out; 
+}
+
+/* Keyframes: Ezberlenince hafif sarsıntı */
+@keyframes ezberOnay {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.01); } 
+    100% { transform: scale(1); }
+}
+
+.ayet-baslik {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #00796B;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.arapca {
+    font-size: 1.8em;
+    direction: rtl; 
+    text-align: right;
+    font-weight: 500;
+    margin-bottom: 15px;
+}
+
+.ayet-detay {
+    font-size: 1em;
+    padding: 5px 0;
+    border-top: 1px dashed #eee;
+    margin-top: 5px;
+}
+
+.gizli {
+    display: none !important; 
+}
+
+/* --- ZİKİR BUTONU HOVER EFECTİ --- */
+.ayet-alt-bar { display: flex; gap: 10px; margin-bottom: 15px; }
+
+.goster-btn, .ezberle-btn { border: none; padding: 8px 15px; font-size: 0.9em; cursor: pointer; border-radius: 3px; }
+
+.goster-btn:hover, .ezberle-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
+
+.goster-btn { background-color: #2196F3; color: white; }
+.ezberle-btn { background-color: #FF9800; color: white; }
+.ezberle-btn:disabled { background-color: #a5a5a5; cursor: not-allowed; }
+
+.zikir-sayac-kutusu { display: flex; align-items: center; background-color: #f0f0f0; padding: 8px; border-radius: 4px; font-weight: bold; font-size: 1.1em; }
+
+.tekrar-sayisi { color: #4CAF50; font-size: 1.2em; margin-left: 5px; margin-right: 15px; }
+.artir-btn { background-color: #03a9f4; color: white; padding: 5px 10px; margin-right: 5px; font-weight: bold; border: none; cursor: pointer; }
+.sifirla-btn { background-color: #9e9e9e; color: white; padding: 5px 10px; border: none; cursor: pointer; }
+
+/* Zikir Butonları Hover */
+.artir-btn:hover { transform: scale(1.1); box-shadow: 0 2px 5px rgba(3, 169, 244, 0.5); }
+.sifirla-btn:hover { transform: scale(1.1); box-shadow: 0 2px 5px rgba(158, 158, 158, 0.5); }
+
+
+/* --- İLERLEME ÇUBUĞU --- */
+#ilerleme-takibi { margin-top: 30px; text-align: center; }
+#ilerleme-takibi h3 { border-bottom: 2px solid #ccc; padding-bottom: 10px; }
+#ilerleme-cubuk { height: 25px; background-color: #ddd; border-radius: 5px; overflow: hidden; margin: 10px 0 20px; }
+#ilerleme-yuzde { height: 100%; background-color: #4CAF50; transition: width 0.5s ease-in-out; }
+
+/* --- HARİTA VE OYUNLAŞTIRMA STİLLERİ --- */
+#harita {
+    padding: 20px;
+    background-color: #e3f2fd; 
+    border-radius: 8px;
+    border: 2px solid #90caf9;
+    text-align: center;
+}
+
+#harita button { 
+    background-color: #f44336; 
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-top: 15px;
+}
+
+#harita-izleyici {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.sure-bolum-buton {
+    padding: 15px 25px;
+    border: 3px solid;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 1.1em;
+    min-width: 150px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.sure-bolum-buton:not(.kilitli):hover {
+    transform: translateY(-3px) scale(1.05); 
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.sure-bolum-buton.kilitli:hover {
+    animation: kilitTitresim 0.2s;
+}
+
+@keyframes kilitTitresim {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+}
+
+.kilitli { background-color: #90a4ae; border-color: #78909c; color: #424242; cursor: default; }
+.aktif-sure { background-color: #ffb74d; border-color: #ff9800; color: #424242; }
+.tamamlanmis-sure { background-color: #4caf50; border-color: #388e3c; color: white; }
+
+#harita-bilgi {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #ffffff;
+    border-radius: 5px;
+    border-left: 5px solid #2196f3;
+    text-align: left;
+}
+
+#mevcut-bolum-adi { color: #2196f3; font-weight: bold; }
+#harita-durum { font-weight: bold; }
