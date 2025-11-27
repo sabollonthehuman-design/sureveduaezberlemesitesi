@@ -3,18 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Haftalık Ezberleme - Fil Suresi</title>
+    <title>Haftalık Ezber Macerası</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>Haftalık Ezberleme Takibi</h1>
-        <p>Bu haftaki hedefiniz (Pazara kadar): **Fil Suresi**</p>
+        <h1>Kur'an Ezber Macerası</h1>
+        <nav id="ana-navigasyon">
+            <button onclick="gosterBolum('harita')" id="nav-harita" class="aktif">🗺️ Harita</button>
+            <button onclick="gosterBolum('ezber')" id="nav-sure">📜 Fil Suresi</button>
+        </nav>
     </header>
 
     <main>
-        <section id="sure-metni">
-            <h2>Fil Suresi (El-Fîl)</h2>
+        <section id="harita" class="bolum-icerik aktif">
+            <h2>Haftalık Ezber Macerası Haritası ⚔️</h2>
+            <div id="harita-izleyici">
+                </div>
+            
+            <div id="harita-bilgi">
+                <h3>Aktif Hedef: <span id="aktif-sure-adi">Yükleniyor...</span></h3>
+                <p>Genel İlerleme: <span id="genel-ilerleme-yuzdesi">0%</span></p>
+                <p>Toplam Tamamlanan Sure: <span id="tamamlanan-sure-adet">0</span> / <span id="toplam-sure-adet">0</span></p>
+            </div>
+            <button onclick="sifirlaIlerleme()">Tüm İlerlemeyi Sıfırla 🔄</button>
+        </section>
+
+        <section id="ezber" class="bolum-icerik gizli">
+            <div id="ezber-baslik">
+                <h2>Fil Suresi (El-Fîl)</h2>
+            </div>
             
             <audio id="sure-seslendirme" controls style="width: 100%; margin-bottom: 15px;">
                 <source src="ses/fil_suresi.mp3" type="audio/mp3">
@@ -24,102 +42,98 @@
 
             <div id="sure-icerik">
                 
-                <div class="ayet-kapsayici" data-ayet="1">
+                <div class="ayet-kapsayici" data-ayet="1" data-sure="fil">
                     <div class="ayet-baslik">1. Ayet</div>
                     <div class="ayet arapca">أَلَمْ تَرَ كَيْفَ فَعَلَ رَبُّكَ بِأَصْحَابِ الْفِيلِ</div>
                     <div class="ayet-detay okunus gizli">Elem tera keyfe fe'ale rabbüke biashâbilfîl.</div>
                     <div class="ayet-detay meal gizli">Görmedin mi Rabbin fil sahiplerine ne yaptı?</div>
-                    
                     <div class="ayet-alt-bar">
                         <button class="goster-btn" onclick="toggleDetay(this)">Okunuş/Meal Göster</button>
-                        <button class="ezberle-btn" onclick="tamamlandiIsaretle(1)">Ezberledim ✅</button>
+                        <button class="ezberle-btn" onclick="tamamlandiIsaretle('fil', 1)">Ezberledim ✅</button>
                     </div>
-
                     <div class="zikir-sayac-kutusu">
-                        Tekrar Sayısı: <span class="tekrar-sayisi" id="tekrar-1">0</span> 
-                        <button class="artir-btn" onclick="tekrarArtir(1)">+1</button>
-                        <button class="sifirla-btn" onclick="tekrarSifirla(1)">Sıfırla</button>
+                        Tekrar Sayısı: <span class="tekrar-sayisi" id="tekrar-fil-1">0</span> 
+                        <button class="artir-btn" onclick="tekrarArtir('fil', 1)">+1</button>
+                        <button class="sifirla-btn" onclick="tekrarSifirla('fil', 1)">Sıfırla</button>
                     </div>
                 </div>
                 
-                <div class="ayet-kapsayici" data-ayet="2">
+                <div class="ayet-kapsayici" data-ayet="2" data-sure="fil">
                     <div class="ayet-baslik">2. Ayet</div>
                     <div class="ayet arapca">أَلَمْ يَجْعَلْ كَيْدَهُمْ فِي تَضْلِيلٍ</div>
                     <div class="ayet-detay okunus gizli">Elem yec'al keydehum fî tadlîl.</div>
                     <div class="ayet-detay meal gizli">Onların tuzaklarını boşa çıkarmadı mı?</div>
                     <div class="ayet-alt-bar">
                         <button class="goster-btn" onclick="toggleDetay(this)">Okunuş/Meal Göster</button>
-                        <button class="ezberle-btn" onclick="tamamlandiIsaretle(2)">Ezberledim ✅</button>
+                        <button class="ezberle-btn" onclick="tamamlandiIsaretle('fil', 2)">Ezberledim ✅</button>
                     </div>
                     <div class="zikir-sayac-kutusu">
-                        Tekrar Sayısı: <span class="tekrar-sayisi" id="tekrar-2">0</span> 
-                        <button class="artir-btn" onclick="tekrarArtir(2)">+1</button>
-                        <button class="sifirla-btn" onclick="tekrarSifirla(2)">Sıfırla</button>
+                        Tekrar Sayısı: <span class="tekrar-sayisi" id="tekrar-fil-2">0</span> 
+                        <button class="artir-btn" onclick="tekrarArtir('fil', 2)">+1</button>
+                        <button class="sifirla-btn" onclick="tekrarSifirla('fil', 2)">Sıfırla</button>
                     </div>
                 </div>
 
-                <div class="ayet-kapsayici" data-ayet="3">
+                <div class="ayet-kapsayici" data-ayet="3" data-sure="fil">
                     <div class="ayet-baslik">3. Ayet</div>
                     <div class="ayet arapca">وَأَرْسَلَ عَلَيْهِمْ طَيْرًا أَبَابِيلَ</div>
                     <div class="ayet-detay okunus gizli">Ve ersele aleyhim tayran ebâbîl.</div>
                     <div class="ayet-detay meal gizli">Üzerlerine sürü sürü kuşlar gönderdi.</div>
                     <div class="ayet-alt-bar">
                         <button class="goster-btn" onclick="toggleDetay(this)">Okunuş/Meal Göster</button>
-                        <button class="ezberle-btn" onclick="tamamlandiIsaretle(3)">Ezberledim ✅</button>
+                        <button class="ezberle-btn" onclick="tamamlandiIsaretle('fil', 3)">Ezberledim ✅</button>
                     </div>
                     <div class="zikir-sayac-kutusu">
-                        Tekrar Sayısı: <span class="tekrar-sayisi" id="tekrar-3">0</span> 
-                        <button class="artir-btn" onclick="tekrarArtir(3)">+1</button>
-                        <button class="sifirla-btn" onclick="tekrarSifirla(3)">Sıfırla</button>
+                        Tekrar Sayısı: <span class="tekrar-sayisi" id="tekrar-fil-3">0</span> 
+                        <button class="artir-btn" onclick="tekrarArtir('fil', 3)">+1</button>
+                        <button class="sifirla-btn" onclick="tekrarSifirla('fil', 3)">Sıfırla</button>
                     </div>
                 </div>
                  
-                <div class="ayet-kapsayici" data-ayet="4">
+                <div class="ayet-kapsayici" data-ayet="4" data-sure="fil">
                     <div class="ayet-baslik">4. Ayet</div>
                     <div class="ayet arapca">تَرْمِيهِم بِحِجَارَةٍ مِّن سِجِّيلٍ</div>
                     <div class="ayet-detay okunus gizli">Termîhim bihicâratin min siccîl.</div>
                     <div class="ayet-detay meal gizli">Onlara, çamurdan pişirilmiş sert taşlar atıyorlardı.</div>
                     <div class="ayet-alt-bar">
                         <button class="goster-btn" onclick="toggleDetay(this)">Okunuş/Meal Göster</button>
-                        <button class="ezberle-btn" onclick="tamamlandiIsaretle(4)">Ezberledim ✅</button>
+                        <button class="ezberle-btn" onclick="tamamlandiIsaretle('fil', 4)">Ezberledim ✅</button>
                     </div>
                     <div class="zikir-sayac-kutusu">
-                        Tekrar Sayısı: <span class="tekrar-sayisi" id="tekrar-4">0</span> 
-                        <button class="artir-btn" onclick="tekrarArtir(4)">+1</button>
-                        <button class="sifirla-btn" onclick="tekrarSifirla(4)">Sıfırla</button>
+                        Tekrar Sayısı: <span class="tekrar-sayisi" id="tekrar-fil-4">0</span> 
+                        <button class="artir-btn" onclick="tekrarArtir('fil', 4)">+1</button>
+                        <button class="sifirla-btn" onclick="tekrarSifirla('fil', 4)">Sıfırla</button>
                     </div>
                 </div>
 
-                <div class="ayet-kapsayici" data-ayet="5">
+                <div class="ayet-kapsayici" data-ayet="5" data-sure="fil">
                     <div class="ayet-baslik">5. Ayet</div>
                     <div class="ayet arapca">فَجَعَلَهُمْ كَعَصْفٍ مَّأْكُولٍ</div>
                     <div class="ayet-detay okunus gizli">Fece'alehum ke'asfin me'kûl.</div>
                     <div class="ayet-detay meal gizli">Nihayet onları, yenilmiş ekin yaprağı gibi yaptı.</div>
                     <div class="ayet-alt-bar">
                         <button class="goster-btn" onclick="toggleDetay(this)">Okunuş/Meal Göster</button>
-                        <button class="ezberle-btn" onclick="tamamlandiIsaretle(5)">Ezberledim ✅</button>
+                        <button class="ezberle-btn" onclick="tamamlandiIsaretle('fil', 5)">Ezberledim ✅</button>
                     </div>
                     <div class="zikir-sayac-kutusu">
-                        Tekrar Sayısı: <span class="tekrar-sayisi" id="tekrar-5">0</span> 
-                        <button class="artir-btn" onclick="tekrarArtir(5)">+1</button>
-                        <button class="sifirla-btn" onclick="tekrarSifirla(5)">Sıfırla</button>
+                        Tekrar Sayısı: <span class="tekrar-sayisi" id="tekrar-fil-5">0</span> 
+                        <button class="artir-btn" onclick="tekrarArtir('fil', 5)">+1</button>
+                        <button class="sifirla-btn" onclick="tekrarSifirla('fil', 5)">Sıfırla</button>
                     </div>
                 </div>
             </div>
 
+            <section id="ilerleme-takibi">
+                <h3>Bu Sure İlerlemesi</h3>
+                <div id="ilerleme-gosterge">
+                    <p>Ezberlenen Ayet Sayısı: <span id="ezberlenen-adet">0</span> / 5</p>
+                    <div id="ilerleme-cubuk">
+                        <div id="ilerleme-yuzde" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </section>
         </section>
 
-        <section id="ilerleme-takibi">
-            <h2>Genel İlerleme</h2>
-            <div id="ilerleme-gosterge">
-                <p>Ezberlenen Ayet Sayısı: <span id="ezberlenen-adet">0</span> / 5</p>
-                <div id="ilerleme-cubuk">
-                    <div id="ilerleme-yuzde" style="width: 0%;"></div>
-                </div>
-            </div>
-            
-            <button onclick="sifirlaIlerleme()">İlerlemeyi Sıfırla 🔄</button>
-        </section>
     </main>
 
     <footer>
